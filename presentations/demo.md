@@ -38,10 +38,19 @@
 
 ## Share your slides
 
-- If you print out the presentation as a PDF file, then you can upload it to "slideshare.com".
+- If you print out the presentation as a PDF file, then you can upload it to "slideshare.com".    $.ajax({
+  
 
 !
 
+# Testing code
+
+```
+Present.reload = function() {  
+  var loaded = false;
+};  
+```
+!
 # Be happy! :)
 
 > _Rather than fighting with keynote or powerpoint **for hours**, I can whip up a presentation in minutes using markdown._
