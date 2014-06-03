@@ -67,7 +67,7 @@ Present.buildSlideCounter = function () {
 
 Present.reload = function() {  
     $.ajax({
-        url: Present.currentPage + '.md',
+        url: 'presentations/'+Present.currentPage+'.md',
         cache: false,
         dataType: 'text',
         success: function(data) {
