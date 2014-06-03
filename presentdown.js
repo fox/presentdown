@@ -1,157 +1,3 @@
-<html>
-<head>
-<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1" />
-<title>Markdown Presenter</title>
-<style>
-  html, body {
-  	margin:0;
-  	border:0;
-  	padding:0;
-  	font-family: helvetica;
-    color: white;
-    overflow: hidden;
-    -ms-touch-action: none;
-    -moz-user-select:none;
-  }
-  div.centered {
-  	margin:auto;
-  	font-size:40px;
-  	width:20em; /* So we get about 10 words per line */
-  }
-  .slideCount {
-    position: fixed;
-    bottom: 1em;
-    right: 2px;
-    height:1.5em;
-    width:8em;
-    overflow:hidden;
-  }
-   .slideProgress
-  {
-    background-color: green;
-    width: 100%;
-    min-height: 10px;
-  }
-  .slideCount select {
-    color:white;
-    background-color:#112;
-    border-color:#112;
-    border:none;
-    font-size:1em;
-    height:1.3em;
-    width:10em;
-
-    -webkit-appearance: none;
-    border-radius:0;
-    -webkit-border-radius: 0;
-  }
-  .padding {
-    height: 60px;
-  }
-
-  /* My styling here */
-  body,
-  .content-holder {
-    background: #223;
-    background: -webkit-gradient(linear, left top, left bottom, from(#334), to(#112));
-    background: -moz-linear-gradient(top,  #334,  #112);
-    text-shadow: #000 0 -2px 0;
-  }
-  .bg {
-    background-image: url(bg.jpg);
-    position:absolute;
-    left:0;
-    right:0;
-    top:0;
-    bottom:0;
-    opacity:0.01;
-    z-index:-1;
-   }
-   code {
-       color: rgb(235, 174, 108);
-  }
-   .for-print .content-holder {
-        width: 100%;
-        height: 100%;
-        border-collapse: collapse;
-   }
-   .for-print .content-holder.template { display:none; }
-   @media screen {
-       .for-print { display:none; }
-   }
-   @media print {
-       .for-screen { display: none; }
-   }
-   @media only screen and (max-width: 768px) {
-       .centered {
-           -ms-zoom: 0.8;
-           zoom: 0.8;
-       }
-   }
-   @media only screen and (max-width: 480px) {
-       .centered {
-           -ms-zoom: 0.5;
-           zoom: 0.5;
-       }
-   }
-   @media only screen and (max-width: 320px) {
-       .centered {
-           -ms-zoom: 0.35;
-           zoom: 0.35;
-       }
-   }
- /* End styling */
-</style>
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
-<script>
-if (!window.jQuery) {
-    document.write('<script src="jquery.min.js"><\/script>');
-}
-</script>
-<script type="text/javascript" src="showdown.js"></script>
-</head>
-<body tabindex="1">
-<div class="for-screen">
-
-<div class="bg">&nbsp;</div>
-
-<table style="width:100%;height:100%;border-collapse:collapse">
-<tr valign=center>
-<td>
-<div class='centered'>
-<em>Loading</em>
-</div>
-</td>
-</tr>
-</table>
-
-<div class="slideCount">
-  <select tabindex="-1">
-  </select>
-  <div class="slideProgress"></div>
-</div>
-
-  <div class="padding">
-    <!-- This padding need to hiding address bar automatically at iPhone/iPad/Android browser. -->
-  </div>
-
-</div>
-
-<div class="for-print">
-    <table class="content-holder template">
-    <tr valign=center>
-    <td>
-    <div class='centered'><h2>Foo</h2>
-    </div>
-    </td>
-    </tr>
-    </table>
-</div>
-
-</body>
-</html>
-
-<script>
 var Present = {
     // Slide transition effects.
     effects: {
@@ -169,13 +15,20 @@ var Present = {
 };
 Present.currentEffect = Present.effects['n']; // Default slide transiton effect is nothing.
 
+Present.hashToPage = function () {
+    var matches = window.location.hash.match(/#(\w+)\/?/);
+    if (matches == null) return null;
+    return matches[1];
+}
+
 Present.hashToSlideIndex = function () {
-    var matches = window.location.hash.match(/#(\d+)/);
+    var matches = window.location.hash.match(/#\w+\/(\d+)/);
     if (matches == null) return 0;
     return parseInt(matches[1]) - 1;
 }
 
 Present.currentSlide = Present.hashToSlideIndex();
+Present.currentPage = Present.hashToPage();
 
 Present.showSlide = function(slide) {
   slide = Math.max(0, Math.min(slide, Present.slides.length - 1));
@@ -189,7 +42,7 @@ Present.showSlide = function(slide) {
 
   $('.slideCount select').val(this.currentSlide);
   $('.slideProgress').css("width", (this.currentSlide + 1)/this.slides.length * 100 + "%");
-  window.location.hash = '#' + (Present.currentSlide + 1);
+  window.location.hash = '#' + Present.currentPage + "/" + (Present.currentSlide + 1);
 };
 Present.nextSlide = function() {
   if (Present.currentSlide < Present.slides.length-1) {
@@ -202,18 +55,6 @@ Present.prevSlide = function() {
   }
 };
 
-Present.buildPrintPage = function () {
-    var forPrint = $('.for-print');
-    $('.content-holder:not(.template)', forPrint).remove();;
-    var template = $('.content-holder.template', forPrint);
-    $.each(Present.slides, function (_, slide) {
-        var holder = template.clone()
-            .appendTo(forPrint)
-            .removeClass('template');
-        $('.centered', holder).html(slide);
-    });
-}
-
 Present.buildSlideCounter = function () {
     var $counter = $('.slideCount select');
     var optionHtmls = [];
@@ -224,9 +65,9 @@ Present.buildSlideCounter = function () {
     $counter.html(optionHtmls.join(''));
 }
 
-Present.reload = function() {
+Present.reload = function() {  
     $.ajax({
-        url: 'presentation.md',
+        url: Present.currentPage + '.md',
         cache: false,
         dataType: 'text',
         success: function(data) {
@@ -236,14 +77,16 @@ Present.reload = function() {
                 Present.slides = converted.split('<p>!</p>');
                 Present.buildSlideCounter();
                 Present.showSlide(Present.currentSlide);
-
-                // If beforeprint event not supported, build pages to printing now.
-                if (('onbeforeprint' in window) === false) Present.buildPrintPage();
             }
         }
     });
 };
-Present.reload();
+
+if (Present.currentPage) {
+  Present.reload();
+} else {
+  console.error("Page name missing! Set page name like this: " + location.href + "#/page-name")
+}
 
 (function () {
     var pageToJump = '';
@@ -288,9 +131,6 @@ Present.reload();
         }
     });
 })();
-
-// Build print page on demand.
-$(window).bind('beforeprint', Present.buildPrintPage);
 
 $(function () {
     var startPos = null;
@@ -373,4 +213,3 @@ $('.slideCount select').change(function () {
     Present.showSlide(parseInt($(this).val()));
     setTimeout(function () { document.body.focus(); }, 0);
 });
-</script>
