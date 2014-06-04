@@ -60,7 +60,7 @@ code {
     color: rgb(235, 174, 108);
 }
 
-li {
+ul>li {
   list-style: circle;
 }
 
@@ -89,4 +89,14 @@ h1,h2,h3,h4,h5,h6 {
         -ms-zoom: 0.35;
         zoom: 0.35;
     }
+}
+
+a {
+  color: black;
+  text-decoration: underline;
+}
+
+h1 {
+  
+  font-size: 2em;
 }
