@@ -1,215 +1,198 @@
-var Present = {
-    // Slide transition effects.
-    effects: {
-        // n: no effect.
-        n: {
-            pre: function (view, callback) { callback(); },
-            post: function (view) { }
-        },
-        // f: fade in/out.
-        f: {
-            pre: function (view, callback) { view.fadeOut('fast', callback); },
-            post: function (view) { view.fadeIn('fast'); }
-        }
-    },
-};
-Present.currentEffect = Present.effects['n']; // Default slide transiton effect is nothing.
+window.Presentdown = {}
 
-Present.hashToPage = function () {
-    var matches = window.location.hash.match(/#(\w+)\/?/);
-    if (matches == null) return null;
-    return matches[1];
+Presentdown.effects = {}
+Presentdown.effects.none = {
+  pre: function (view, callback) { callback() },
+  post: function (view) { }
 }
 
-Present.hashToSlideIndex = function () {
-    var matches = window.location.hash.match(/#\w+\/(\d+)/);
-    if (matches == null) return 0;
-    return parseInt(matches[1]) - 1;
+Presentdown.effects.fade = {
+  pre: function (view, callback) { callback() },
+  post: function (view) { }
 }
 
-Present.currentSlide = Present.hashToSlideIndex();
-Present.currentPage = Present.hashToPage();
+// no effects for now
+Presentdown.currentEffect = Presentdown.effects.none
 
-Present.showSlide = function(slide) {
-  slide = Math.max(0, Math.min(slide, Present.slides.length - 1));
-  Present.currentSlide = slide;
+Presentdown.hashToPage = function () {
+  var matches = window.location.hash.match(/#(\w+)\/?/)
+  if (matches == null) return null
+  
+  return matches[1]
+}
 
-  var $view = $('.for-screen .centered');
+Presentdown.hashToSlideIndex = function () {
+  var matches = window.location.hash.match(/#\w+\/(\d+)/)
+  if (matches == null) return 0
+  
+  return parseInt(matches[1]) - 1
+}
+
+Presentdown.currentSlide = Presentdown.hashToSlideIndex()
+Presentdown.currentPage = Presentdown.hashToPage()
+
+Presentdown.showSlide = function(slide) {
+  var slide = Math.max(0, Math.min(slide, Presentdown.slides.length - 1))
+  Presentdown.currentSlide = slide
+
+  $('body')
+    .removeClass('slide-' + Presentdown.currentSlide)
+    .addClass('slide-' + (Presentdown.currentSlide + 1))
+
+  var $view = $('#content')
+  
   this.currentEffect.pre($view, $.proxy(function () {
-      $view.html(this.slides[this.currentSlide]);
-      this.currentEffect.post($view);
-  }, this));
+    $view.html(this.slides[this.currentSlide])
+    this.currentEffect.post($view)
+  }, this))
 
-  $('.slideCount select').val(this.currentSlide);
-  $('.slideProgress').css("width", (this.currentSlide + 1)/this.slides.length * 100 + "%");
-  window.location.hash = '#' + Present.currentPage + "/" + (Present.currentSlide + 1);
-};
-Present.nextSlide = function() {
-  if (Present.currentSlide < Present.slides.length-1) {
-    Present.showSlide(Present.currentSlide+1);
-  }
-};
-Present.prevSlide = function() {
-  if (Present.currentSlide > 0) {
-    Present.showSlide(Present.currentSlide-1);
-  }
-};
-
-Present.buildSlideCounter = function () {
-    var $counter = $('.slideCount select');
-    var optionHtmls = [];
-    var numOfSlides = this.slides.length;
-    $.each(this.slides, function (i) {
-        optionHtmls.push('<option value="' + i + '">Slide ' + (i + 1) + ' of ' + numOfSlides + '</option>');
-    });
-    $counter.html(optionHtmls.join(''));
+  $('#progress').css("width", (this.currentSlide + 1)/this.slides.length * 100 + "%")
+  
+  window.location.hash = '#' + Presentdown.currentPage + "/" + (Presentdown.currentSlide + 1)
 }
 
-Present.reload = function() {  
-    $.ajax({
-        url: 'presentations/'+Present.currentPage+'.md',
-        cache: false,
-        dataType: 'text',
-        success: function(data) {
-            if (data.length>0) {
-                converter = new Showdown.converter();
-                var converted = converter.makeHtml(data);
-                Present.slides = converted.split('<p>!</p>');
-                Present.buildSlideCounter();
-                Present.showSlide(Present.currentSlide);
-            }
-        }
-    });
-};
+Presentdown.nextSlide = function() {
+  if (Presentdown.currentSlide < Presentdown.slides.length-1) {
+  Presentdown.showSlide(Presentdown.currentSlide+1)
+  }
+}
 
-if (Present.currentPage) {
-  Present.reload();
+Presentdown.prevSlide = function() {
+  if (Presentdown.currentSlide > 0) {
+  Presentdown.showSlide(Presentdown.currentSlide-1)
+  }
+}
+
+Presentdown.load = function() {  
+  $.ajax({
+    url: 'presentations/'+Presentdown.currentPage+'.md',
+    cache: false,
+    dataType: 'text',
+    success: function(data) {
+      if (data.length>0) {
+        converter = new Showdown.converter()
+        var converted = converter.makeHtml(data)
+        Presentdown.slides = converted.split('<p>!</p>')
+        Presentdown.showSlide(Presentdown.currentSlide)
+      }
+    }
+  })
+}
+
+if (Presentdown.currentPage) {
+  
+  Presentdown.load()
 } else {
   console.error("Page name missing! Set page name like this: " + location.href + "#/page-name")
 }
 
 (function () {
-    var pageToJump = '';
-    var effectCmd = false;
+  var pageToJump = ''
+  var effectCmd = false
 
-    $(document).keydown(function(e){
-        if (e.keyCode == 13) { // enter
-            if (pageToJump != '') {
-                Present.showSlide(parseInt(pageToJump) - 1);
-                pageToJump = '';
-            }
-        }
-        if (48 <= e.keyCode && e.keyCode <= 57) {
-            pageToJump += String.fromCharCode(e.keyCode);
-        }
-        else {
-            pageToJump = '';
-        }
-
-        // Detect key combination to change slide transition effect. 
-        // ex) 'e','f' -> change effect to fade in/out.
-        if (e.keyCode == 'E'.charCodeAt(0)) effectCmd = true;
-        else if (effectCmd)
-        {
-            var effectName = String.fromCharCode(e.keyCode).toLowerCase();
-            var effect = Present.effects[effectName];
-            if (typeof (effect) !== 'undefined') Present.currentEffect = effect;
-            effectCmd = false;
-        }
-
-        if (e.keyCode == 37) {
-            Present.prevSlide();
-            return false;
-        }
-        if (e.keyCode == 39) {
-            Present.nextSlide();
-            return false;
-        }
-        if (e.keyCode == 32) { // space
-            Present.reload();
-            return false;
-        }
-    });
-})();
+  $(document).keydown(function(e){
+    if (e.keyCode == 13) { // enter
+      if (pageToJump != '') {
+        Presentdown.showSlide(parseInt(pageToJump) - 1)
+        pageToJump = ''
+      }
+    }
+    
+    if (48 <= e.keyCode && e.keyCode <= 57) {
+      pageToJump += String.fromCharCode(e.keyCode)
+    }
+    else {
+      pageToJump = ''
+    }
+    
+    if (e.keyCode == 37) {
+      Presentdown.prevSlide()
+      return false
+    }
+    if (e.keyCode == 39) {
+      Presentdown.nextSlide()
+      return false
+    }
+  })
+})()
 
 $(function () {
-    var startPos = null;
-    var isPointerTypeTouch = function (e) {
-        if ('pointerType' in e.originalEvent)
-            return (e.originalEvent.pointerType == 'touch');
-        else true;
-    };
-    var getPos = function (e) {
-        if ('touches' in e.originalEvent) {
-            var touches = e.originalEvent.touches;
-            if (touches.length < 1) return { x: 0, y: 0 };
-            return { x: touches[0].pageX, y: touches[0].pageY };
-        }
-        return { x: e.pageX, y: e.pageY };
-    };
-    var ontouchstart = function (e) {
-        if (isPointerTypeTouch(e) === false) return;
-        startPos = getPos(e);
+  
+  var startPos = null
+  var isPointerTypeTouch = function (e) {
+    if ('pointerType' in e.originalEvent)
+      return (e.originalEvent.pointerType == 'touch')
+    else true
+  }
+  
+  var getPos = function (e) {
+    if ('touches' in e.originalEvent) {
+      var touches = e.originalEvent.touches
+      if (touches.length < 1) return { x: 0, y: 0 }
+      return { x: touches[0].pageX, y: touches[0].pageY }
     }
-    var ontouchmove = function (e) {
-        if (startPos === null || isPointerTypeTouch(e) === false) return;
-        var pos = getPos(e);
-        var d = { x: startPos.x - pos.x, y: startPos.y - pos.y };
-        if (Math.abs(d.x) >=40) {
-            startPos = null;
-            $(this).trigger(d.x < 0 ? 'swiperight' : 'swipeleft');
-            return false;
-        }
+    return { x: e.pageX, y: e.pageY }
+  }
+  
+  var onTouchStart = function (e) {
+    if (isPointerTypeTouch(e) === false) return
+    startPos = getPos(e)
+  }
+  
+  var onTouchMove = function (e) {
+    if (startPos === null || isPointerTypeTouch(e) === false) return
+    var pos = getPos(e)
+    var d = { x: startPos.x - pos.x, y: startPos.y - pos.y }
+    if (Math.abs(d.x) >=40) {
+      startPos = null
+      $(this).trigger(d.x < 0 ? 'swiperight' : 'swipeleft')
+      return false
     }
-    var ontouchend = function (e) {
-        if (startPos === null || isPointerTypeTouch(e) === false) return;
-        startPos = null;
-    }
+  }
+  
+  var onTouchEnd = function (e) {
+    if (startPos === null || isPointerTypeTouch(e) === false) return
+    startPos = null
+  }
 
-    var hideaddressbar = function () {
-        setTimeout(function () { window.scrollTo(0, 1); }, 100);
-    };
+  var hideAddressBar = function () {
+    setTimeout(function () { window.scrollTo(0, 1) }, 100)
+  }
 
-    $(document.body)
-        .bind({
-            // IE10
-            'MSPointerDown': ontouchstart,
-            'MSPointerMove': ontouchmove,
-            'MSPointerUp': ontouchend,
-            
-            // IE11+
-            'pointerdown': ontouchstart,
-            'pointermove': ontouchmove,
-            'pointerup': ontouchend,
-            
-            // Webkit, Gecko
-            'touchstart': ontouchstart,
-            'touchmove': ontouchmove,
-            'touchend': ontouchend,
-            'swiperight': function () {
-                Present.prevSlide();
-                hideaddressbar();
-            },
-            'swipeleft': function () {
-                Present.nextSlide();
-                hideaddressbar();
-            }
-        });
+  $(document.body)
+    .bind({
+      // IE10
+      'MSPointerDown': onTouchStart,
+      'MSPointerMove': onTouchMove,
+      'MSPointerUp': onTouchEnd,
+      
+      // IE11+
+      'pointerdown': onTouchStart,
+      'pointermove': onTouchMove,
+      'pointerup': onTouchEnd,
+      
+      // Webkit, Gecko
+      'touchstart': onTouchStart,
+      'touchmove': onTouchMove,
+      'touchend': onTouchEnd,
+      'swiperight': function () {
+        Presentdown.prevSlide()
+        hideAddressBar()
+      },
+      'swipeleft': function () {
+        Presentdown.nextSlide()
+        hideAddressBar()
+      }
+    })
 
-    hideaddressbar();
+  hideAddressBar()
 
-    $(window).bind('orientationchange', hideaddressbar);
-});
+  $(window).bind('orientationchange', hideAddressBar)
+})
 
-// Go to page by hash of URL changed.
 $(window).bind('hashchange', function () {
-    var slideIndex = Present.hashToSlideIndex();
-    if (Present.currentSlide != slideIndex)
-        Present.showSlide(slideIndex);
-});
+  var slideIndex = Presentdown.hashToSlideIndex()
 
-// Go to page by drop down list changed.
-$('.slideCount select').change(function () {
-    Present.showSlide(parseInt($(this).val()));
-    setTimeout(function () { document.body.focus(); }, 0);
-});
+  if (Presentdown.currentSlide != slideIndex)
+    Presentdown.showSlide(slideIndex)
+})

@@ -1,0 +1,30 @@
+body {
+ border: 0px; 
+ margin: 0px;
+ padding: 0px;
+ overflow: hidden;
+ -ms-touch-action: none;
+ -moz-user-select:none;
+}
+
+#content {
+  position: relative;
+  top: 20%;
+  font-size: 2em;
+  margin: auto;
+  width: 20em;
+}
+
+#progress {
+  background-color: #999;
+  width: 100px;
+  min-height: 3px;
+}
+
+ul > li {
+  list-style: none;
+}
+
+ul {
+  padding-left: 0px;
+}

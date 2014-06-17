@@ -14,7 +14,7 @@
 
 ## Moving between slides
 
-- You've figured this already, but on touch screens you can swipe
+- You've done it already, but on touch screens you can swipe
 
 !
 
