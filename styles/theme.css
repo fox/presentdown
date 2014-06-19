@@ -7,6 +7,10 @@ body {
   color: #444;
 }
 
+#progress {
+  background-color: #00adee;
+}
+
 code {
   color: #990088;
 }

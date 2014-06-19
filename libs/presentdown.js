@@ -1,19 +1,5 @@
 window.Presentdown = {}
 
-Presentdown.effects = {}
-Presentdown.effects.none = {
-  pre: function (view, callback) { callback() },
-  post: function (view) { }
-}
-
-Presentdown.effects.fade = {
-  pre: function (view, callback) { callback() },
-  post: function (view) { }
-}
-
-// no effects for now
-Presentdown.currentEffect = Presentdown.effects.none
-
 Presentdown.hashToPage = function () {
   var matches = window.location.hash.match(/#(\w+)\/?/)
   if (matches == null) return null
@@ -28,62 +14,59 @@ Presentdown.hashToSlideIndex = function () {
   return parseInt(matches[1]) - 1
 }
 
-Presentdown.currentSlide = Presentdown.hashToSlideIndex()
-Presentdown.currentPage = Presentdown.hashToPage()
+Presentdown.slideIndex = Presentdown.hashToSlideIndex()
+Presentdown.page = Presentdown.hashToPage()
 
 Presentdown.showSlide = function(slide) {
-  var slide = Math.max(0, Math.min(slide, Presentdown.slides.length - 1))
-  Presentdown.currentSlide = slide
+  Presentdown.slideIndex = Math.max(0, Math.min(slide, Presentdown.slides.length - 1))
 
   $('body')
-    .removeClass('slide-' + Presentdown.currentSlide)
-    .addClass('slide-' + (Presentdown.currentSlide + 1))
+    .removeClass('slide-' + Presentdown.slideIndex)
+    .addClass('slide-' + (Presentdown.slideIndex + 1))
 
-  var $view = $('#content')
+  $('#content')
+    .html(this.slides[this.slideIndex])  
   
-  this.currentEffect.pre($view, $.proxy(function () {
-    $view.html(this.slides[this.currentSlide])
-    this.currentEffect.post($view)
-  }, this))
+  
+  $('#progress').css('width', this.slideIndex/(this.slides.length-1) * 100 + '%' )
 
-  $('#progress').css("width", (this.currentSlide + 1)/this.slides.length * 100 + "%")
-  
-  window.location.hash = '#' + Presentdown.currentPage + "/" + (Presentdown.currentSlide + 1)
+  window.location.hash = '#' + Presentdown.page + "/" + (Presentdown.slideIndex + 1)
 }
 
 Presentdown.nextSlide = function() {
-  if (Presentdown.currentSlide < Presentdown.slides.length-1) {
-  Presentdown.showSlide(Presentdown.currentSlide+1)
+  if (Presentdown.slideIndex < Presentdown.slides.length-1) {
+    Presentdown.showSlide(Presentdown.slideIndex+1)
   }
 }
 
 Presentdown.prevSlide = function() {
-  if (Presentdown.currentSlide > 0) {
-  Presentdown.showSlide(Presentdown.currentSlide-1)
+  if (Presentdown.slideIndex > 0) {
+    Presentdown.showSlide(Presentdown.slideIndex-1)
   }
 }
 
 Presentdown.load = function() {  
   $.ajax({
-    url: 'presentations/'+Presentdown.currentPage+'.md',
+    url: 'presentations/'+Presentdown.page+'.md',
     cache: false,
     dataType: 'text',
-    success: function(data) {
-      if (data.length>0) {
+    success: function(markdown) {
+      if (markdown.length > 0) {
+        markdown = markdown.replace(/\n(#{1,3})/g, "\n!\n\n$1")
+        console.log(markdown);
         converter = new Showdown.converter()
-        var converted = converter.makeHtml(data)
+        var converted = converter.makeHtml(markdown)
         Presentdown.slides = converted.split('<p>!</p>')
-        Presentdown.showSlide(Presentdown.currentSlide)
+        Presentdown.showSlide(Presentdown.slideIndex)
       }
     }
   })
 }
 
-if (Presentdown.currentPage) {
-  
+if (Presentdown.page) {  
   Presentdown.load()
 } else {
-  console.error("Page name missing! Set page name like this: " + location.href + "#/page-name")
+  console.error("Page missing Set page name like this: " + location.href + "#/page-name")
 }
 
 (function () {
@@ -117,8 +100,8 @@ if (Presentdown.currentPage) {
 })()
 
 $(function () {
-  
   var startPos = null
+  
   var isPointerTypeTouch = function (e) {
     if ('pointerType' in e.originalEvent)
       return (e.originalEvent.pointerType == 'touch')
@@ -193,6 +176,7 @@ $(function () {
 $(window).bind('hashchange', function () {
   var slideIndex = Presentdown.hashToSlideIndex()
 
-  if (Presentdown.currentSlide != slideIndex)
+  if (Presentdown.slideIndex != slideIndex) {
     Presentdown.showSlide(slideIndex)
+  }
 })
