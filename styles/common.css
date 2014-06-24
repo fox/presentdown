@@ -3,16 +3,18 @@ body {
  margin: 0px;
  padding: 0px;
  overflow: hidden;
+ height: 100%;
  -ms-touch-action: none;
  -moz-user-select:none;
 }
 
 #content {
   position: relative;
-  top: 20%;
-  font-size: 2em;
+  height: 100%;
+  font-size: 1.5em;
+  padding: 15% 5% 0% 5%;
   margin: auto;
-  width: 20em;
+  width: 25em;
 }
 
 #progress {
@@ -20,6 +22,10 @@ body {
   height: 2px;
   bottom: 5px;
   position: absolute;
+}
+
+h1 {
+  font-size: 2.2em;
 }
 
 ul > li {

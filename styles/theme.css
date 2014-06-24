@@ -4,7 +4,7 @@
 body {
   background: #fff;
   font-family: 'Open Sans', sans-serif;
-  color: #444;
+  color: #333;
 }
 
 #progress {
@@ -23,4 +23,8 @@ h1, h2, h3, h4, h5, h6 {
 a {
   color: black;
   text-decoration: underline;
+}
+
+body.slide-1 {
+  background: url(http://fiveminutesstudio.com/assets/futer_logo.png) no-repeat center bottom fixed; 
 }

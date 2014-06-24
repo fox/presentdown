@@ -3,14 +3,12 @@ window.Presentdown = {}
 Presentdown.hashToPage = function () {
   var matches = window.location.hash.match(/#(\w+)\/?/)
   if (matches == null) return null
-  
   return matches[1]
 }
 
 Presentdown.hashToSlideIndex = function () {
   var matches = window.location.hash.match(/#\w+\/(\d+)/)
-  if (matches == null) return 0
-  
+  if (matches == null) return 0  
   return parseInt(matches[1]) - 1
 }
 
@@ -26,8 +24,7 @@ Presentdown.showSlide = function(slide) {
 
   $('#content')
     .html(this.slides[this.slideIndex])  
-  
-  
+    
   $('#progress').css('width', this.slideIndex/(this.slides.length-1) * 100 + '%' )
 
   window.location.hash = '#' + Presentdown.page + "/" + (Presentdown.slideIndex + 1)
@@ -66,12 +63,11 @@ Presentdown.load = function() {
 if (Presentdown.page) {  
   Presentdown.load()
 } else {
-  console.error("Page missing Set page name like this: " + location.href + "#/page-name")
+  console.error("Page missing! Set page name lie " + location.href + "#/page-name")
 }
 
 (function () {
   var pageToJump = ''
-  var effectCmd = false
 
   $(document).keydown(function(e){
     if (e.keyCode == 13) { // enter
