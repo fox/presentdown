@@ -27,6 +27,8 @@ Presentdown.showSlide = function(slide) {
     
   $('#progress').css('width', this.slideIndex/(this.slides.length-1) * 100 + '%' )
 
+  document.title = $('#content').find('h1,h2,h3').first().text()
+
   window.location.hash = '#' + Presentdown.page + "/" + (Presentdown.slideIndex + 1)
 }
 
