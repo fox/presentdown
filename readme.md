@@ -20,4 +20,4 @@ You've done it already, but on touch screens you can swipe
 ## Credits
 
 * [@hakeraj](https://twitter.com/hakeraj)
-* [@jsakamoto](https://github.com/jsakamoto/MarkdownPresenter) and [@chrishulbert](https://github.com/chrishulbert/MarkdownPresenter) for the original fork
+* [@jsakamoto](https://github.com/jsakamoto/MarkdownPresenter) and [@chrishulbert](https://github.com/chrishulbert/MarkdownPresenter) for the original fork (MarkdownPresenter)
