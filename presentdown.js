@@ -13,7 +13,7 @@ Presentdown.hashToSlideIndex = function () {
 }
 
 Presentdown.slideIndex = Presentdown.hashToSlideIndex()
-Presentdown.page = Presentdown.hashToPage()
+Presentdown.page = Presentdown.hashToPage() || 'readme'
 
 Presentdown.showSlide = function(slide) {
   Presentdown.slideIndex = Math.max(0, Math.min(slide, Presentdown.slides.length - 1))
@@ -42,9 +42,9 @@ Presentdown.prevSlide = function() {
   }
 }
 
-Presentdown.load = function() {  
+Presentdown.load = function(page) {  
   $.ajax({
-    url: Presentdown.page+'.md',
+    url: page+'.md',
     cache: false,
     dataType: 'text',
     success: function(markdown) {
@@ -157,10 +157,6 @@ $(function () {
     }
   })
     
-  if (Presentdown.page) {  
-    Presentdown.load()
-  } else {
-    console.error("Page missing! Set page name lie " + location.href + "#/page-name")
-  }
+  Presentdown.load(Presentdown.page)
 
 })
