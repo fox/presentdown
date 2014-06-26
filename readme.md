@@ -14,7 +14,7 @@ Press `←` or `→` or `slide number` + `⏎`, and on touch screens you can swi
 
 ## Learn
 
-* [Markdown](http://softwaremaniacs.org/playground/showdown-highlight) 
+* [Markdown](http://markdowntutorial.com/lesson/1/) 
 * [How to Create Presentations that Don't Suck](http://lifehacker.com/5810271/how-to-create-presentations-that-dont-suck)
 
 ## Credits
