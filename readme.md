@@ -5,8 +5,8 @@ The **ultimate** in lazy presentation technology (LPT).
 ## Steps
 
 1. Write presentation in Markdown
-2. Separate slides with title or `!` character
-3. Point your browser to `index.html#(path)`. For example, [`index.html#readme`](http://hakeraj.com/presentdown).
+2. Separate slides with title or `!` mark
+3. Point your browser to `index.html#(path)`. For example, [`index.html#readme`](http://hakeraj.com/presentdown)
 
 ## Moving between slides
 
