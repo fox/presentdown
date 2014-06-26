@@ -10,7 +10,7 @@ The **ultimate** in lazy presentation technology (LPT).
 
 ## Moving between slides
 
-Press `←` or `→` or `slide number+⏎`, and on touch screens you can swipe.
+Press `←` or `→` or `slide number` + `⏎`, and on touch screens you can swipe.
 
 ## Learn
 
