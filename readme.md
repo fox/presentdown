@@ -4,9 +4,9 @@ The **ultimate** in lazy presentation technology (LPT)
 
 ## Steps
 
-1. Write presentation in [Markdown](http://daringfireball.net/projects/markdown/)
-2. Separate slides with `!` sign
-3. Point your browser to `index.html#(path)` i.e. `index.html#readme` for this file
+1. Write presentation in Markdown
+2. Separate slides with title or `!` character
+3. Point your browser to `index.html#(path)` e.g. `index.html#readme` for this file
 
 ## Moving between slides
 
@@ -20,4 +20,4 @@ You've done it already, but on touch screens you can swipe
 ## Credits
 
 * [@hakeraj](https://twitter.com/hakeraj)
-* [@jsakamoto](https://github.com/jsakamoto/MarkdownPresenter) and [@chrishulbert](https://github.com/chrishulbert/MarkdownPresenter) for the original fork (MarkdownPresenter)
+* [@jsakamoto](https://github.com/jsakamoto/MarkdownPresenter) and [@chrishulbert](https://github.com/chrishulbert/MarkdownPresenter) for the original fork
