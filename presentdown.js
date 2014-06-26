@@ -1,13 +1,13 @@
 window.Presentdown = {}
 
 Presentdown.hashToPage = function () {
-  var matches = window.location.hash.match(/#(\w+)\/?/)
+  var matches = window.location.hash.match(/#([^\/]+)\/?/)
   if (matches == null) return null
   return matches[1]
 }
 
 Presentdown.hashToSlideIndex = function () {
-  var matches = window.location.hash.match(/#\w+\/(\d+)/)
+  var matches = window.location.hash.match(/#[^\/]+\/(\d+)/)
   if (matches == null) return 0  
   return parseInt(matches[1]) - 1
 }
@@ -44,7 +44,7 @@ Presentdown.prevSlide = function() {
 
 Presentdown.load = function() {  
   $.ajax({
-    url: 'presentations/'+Presentdown.page+'.md',
+    url: Presentdown.page+'.md',
     cache: false,
     dataType: 'text',
     success: function(markdown) {
@@ -60,42 +60,9 @@ Presentdown.load = function() {
   })
 }
 
-if (Presentdown.page) {  
-  Presentdown.load()
-} else {
-  console.error("Page missing! Set page name lie " + location.href + "#/page-name")
-}
-
-(function () {
-  var pageToJump = ''
-
-  $(document).keydown(function(e){
-    if (e.keyCode == 13) { // enter
-      if (pageToJump != '') {
-        Presentdown.showSlide(parseInt(pageToJump) - 1)
-        pageToJump = ''
-      }
-    }
-    
-    if (48 <= e.keyCode && e.keyCode <= 57) {
-      pageToJump += String.fromCharCode(e.keyCode)
-    }
-    else {
-      pageToJump = ''
-    }
-    
-    if (e.keyCode == 37) {
-      Presentdown.prevSlide()
-      return false
-    }
-    if (e.keyCode == 39) {
-      Presentdown.nextSlide()
-      return false
-    }
-  })
-})()
-
 $(function () {
+  $(document.body).html("<div id='content'></div><div id='progress'></div>")
+    
   var startPos = null
   
   var isPointerTypeTouch = function (e) {
@@ -150,24 +117,50 @@ $(function () {
       'touchstart': onTouchStart,
       'touchmove': onTouchMove,
       'touchend': onTouchEnd,
-      'swiperight': function () {
-        Presentdown.prevSlide()
-        hideAddressBar()
-      },
-      'swipeleft': function () {
-        Presentdown.nextSlide()
-        hideAddressBar()
-      }
+      'swiperight': Presentdown.prevSlide,
+      'swipeleft': Presentdown.nextSlide
     })
 
+  $(window)
+    .bind('hashchange', function () {
+      var slideIndex = Presentdown.hashToSlideIndex()
 
-  $(window).bind('orientationchange', hideAddressBar)
-})
-
-$(window).bind('hashchange', function () {
-  var slideIndex = Presentdown.hashToSlideIndex()
-
-  if (Presentdown.slideIndex != slideIndex) {
-    Presentdown.showSlide(slideIndex)
+      if (Presentdown.slideIndex != slideIndex) {
+        Presentdown.showSlide(slideIndex)
+      }
+  })
+  
+  var pageToJump = ''
+  
+  $(document).keydown(function(e){
+    if (e.keyCode == 13) { // enter
+      if (pageToJump != '') {
+        Presentdown.showSlide(parseInt(pageToJump) - 1)
+        pageToJump = ''
+      }
+    }
+    
+    if (48 <= e.keyCode && e.keyCode <= 57) {
+      pageToJump += String.fromCharCode(e.keyCode)
+    }
+    else {
+      pageToJump = ''
+    }
+    
+    if (e.keyCode == 37) {
+      Presentdown.prevSlide()
+      return false
+    }
+    if (e.keyCode == 39) {
+      Presentdown.nextSlide()
+      return false
+    }
+  })
+    
+  if (Presentdown.page) {  
+    Presentdown.load()
+  } else {
+    console.error("Page missing! Set page name lie " + location.href + "#/page-name")
   }
+
 })
